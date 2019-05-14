@@ -1,0 +1,9 @@
+﻿  stdafx.cpp
+  AssemblyInfo.cpp
+  Compiler.cpp
+  ErrorsModule.cpp
+  LexAnalyzer.cpp
+c:\users\eduardo\source\repos\compilerui\compiler\compiler.h(17): error C2143: syntax error: missing ';' before '*'
+c:\users\eduardo\source\repos\compilerui\compiler\compiler.h(17): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+c:\users\eduardo\source\repos\compilerui\compiler\compiler.h(17): error C2238: unexpected token(s) preceding ';'
+  Generating Code...
