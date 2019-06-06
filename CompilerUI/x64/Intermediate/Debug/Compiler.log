@@ -3,7 +3,8 @@
   Compiler.cpp
   ErrorsModule.cpp
   LexAnalyzer.cpp
-c:\users\eduardo\source\repos\compilerui\compiler\compiler.h(17): error C2143: syntax error: missing ';' before '*'
-c:\users\eduardo\source\repos\compilerui\compiler\compiler.h(17): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\eduardo\source\repos\compilerui\compiler\compiler.h(17): error C2238: unexpected token(s) preceding ';'
+  Token.cpp
   Generating Code...
+  .NETFramework,Version=v4.6.1.AssemblyAttributes.cpp
+  AssemblyInfo.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
+  Compiler.vcxproj -> C:\Users\Eduardo\Documents\Compiladores\CompilerUI\x64\Exe\Debug\Compilerx64d.dll

@@ -17,48 +17,45 @@ namespace CompilerUI
 {
     public partial class compilerWindow : Form
     {
+        String str;
+        String FilePath;
+        String dllFullPath;
+        List<String> Token = new List<String>();
         dynamic compilerDLLInstance;
         bool isDLLLoader;
         bool currentAssemblyisDebug;
         bool currentAssembluisx64;
         bool isSaved;
+
         public compilerWindow()
         {
             InitializeComponent();
+            dllFullPath = "";
+            FilePath = null;
             isDLLLoader = false;
             isSaved = false;
         }
 
         private void nuevoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!isSaved)
+            if (textBox1.Modified)
             {
-                String message = "¿Desea guardar los cambios?";
-                MessageBoxButtons buttons = MessageBoxButtons.YesNoCancel;
-                DialogResult result;
-                result = MessageBox.Show(message, " no guardado", buttons);
-                if(result == System.Windows.Forms.DialogResult.Yes)
-                {
-
-                }
-                if(result == System.Windows.Forms.DialogResult.No)
-                {
-
-                }
-                if (result == System.Windows.Forms.DialogResult.Cancel)
-                {
-
-                }
+                IsSaved();
+                textBox1.Text = "";
             }
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string text;
-            openFileDialog1.ShowDialog();
-            System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog1.FileName);
-            text = file.ReadLine();
-            textBox1.Text = text.ToString();
+            if (textBox1.Modified)
+                IsSaved();
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog1.FileName);
+                text = file.ReadLine();
+                textBox1.Text = text.ToString();
+            }
         }
 
         private void textBox1_ModifiedChanged(object sender, EventArgs e)
@@ -68,11 +65,7 @@ namespace CompilerUI
 
         private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.FileName = "Sin Titulo.txt";
-            using (var SaveFile = new System.IO.StreamWriter(saveFileDialog1.FileName))
-            {
-                SaveFile.WriteLine(textBox1.Text);
-            }
+            Guardar();
             isSaved = true;
         }
 
@@ -83,21 +76,8 @@ namespace CompilerUI
 
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!isSaved)
-            {
-                String message = "¿Desea guardar los cambios?";
-                MessageBoxButtons buttons = MessageBoxButtons.YesNoCancel;
-                DialogResult result;
-                result = MessageBox.Show(message, " no guardado", buttons);
-                if (result == System.Windows.Forms.DialogResult.Yes)
-                {
-
-                }
-                if (result == System.Windows.Forms.DialogResult.Cancel)
-                {
-
-                }
-            }
+            if (textBox1.Modified)
+                IsSaved();
             Environment.Exit(0);
         }
 
@@ -116,11 +96,83 @@ namespace CompilerUI
             if (isDLLLoader)
             {
                 String[] output = compilerDLLInstance.compileProgram(textBox1.Text);
-                Output.Lines = output;
+                Output.Text = output[0];
+                if (output[2] != null)
+                {
+                    Output.Text += "\r\n";
+                    Output.Text += output[2];
+                }
+                else
+                {
+                    Output.Text += "\r\n";
+                    Output.Text += "no se detectaron errores";
+                }
+                Update();
+                dataGridView1.Rows.Clear();
+                String tokens = output[1];
+                if (tokens != null)
+                {
+                    for (int i = 0; i < tokens.Length; i++)
+                    {
+
+                        if (tokens[i] != '@')
+                        {
+                            str += tokens[i];
+                            //i++;
+                        }
+                        if (tokens[i + 1] == '@')
+                        {
+                            Token.Add(str);
+                            str = "";
+                            i++;
+                        }
+                        if (Token.Count == 3)
+                        {
+                            dataGridView1.Rows.Add(Token[0], Token[1], Token[2]);
+
+                            Token.Clear();
+                        }
+                    }
+                }
             }
             else
             {
+                string mesg = "No se pudo cargar la DLL";
+                string name = "cargar DLL";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result = MessageBox.Show(mesg, name, buttons, MessageBoxIcon.Error);
+                return;
+            }
+        }
 
+        private void IsSaved()
+        {
+            String message;
+            if (null != FilePath)
+                message = "¿Desea guardar los cambios?";
+            else
+                message = "¿Desea guardar el documento?";
+            MessageBoxButtons buttons = MessageBoxButtons.YesNoCancel;
+            DialogResult result;
+            result = MessageBox.Show(message, "Sin Guardar", buttons);
+            if (result == System.Windows.Forms.DialogResult.Yes)
+            {
+                if (null == FilePath)
+                    Guardar();
+                else
+                    GuardarComo();
+            }
+        }
+        
+        private void Guardar()
+        {
+            if (saveFileDialog1.FileName != "")
+            {
+                FilePath = Path.GetFullPath(saveFileDialog1.FileName);
+            }
+            else
+            {
+                GuardarComo();
             }
         }
 
@@ -151,7 +203,6 @@ namespace CompilerUI
                 up = Directory.GetParent(baseProj);
                 baseProj = up.FullName;
             }
-            String dllFullPath;
             currentAssemblyisDebug = System.Diagnostics.Debugger.IsAttached;
             currentAssembluisx64 = System.Environment.Is64BitProcess;
             if (currentAssemblyisDebug)

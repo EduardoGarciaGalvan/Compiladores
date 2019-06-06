@@ -20,6 +20,8 @@ Compiler::Manager::~Manager()
 cli::array<String^>^ Compiler::Manager::compileProgram(String ^ srcCode)
 {
 	cli::array<String^>^ CompilationDetails;
+	lex->clearTokens();
+	err->clearErrors();
 	lexAnalisys(srcCode);
 	CompilationDetails = gcnew cli::array < String^>(1);
 	CompilationDetails[0] = gcnew String("---Compile OK---");
